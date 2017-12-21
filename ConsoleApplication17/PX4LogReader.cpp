@@ -80,32 +80,29 @@ unordered_map<string, string> PX4LogReader::formatNames = unordered_map<string, 
 int main() {
 
 	// 要读入整个文件，必须采用二进制打开   
-	ifstream ifile("15_49_43.px4log", ios::in | ios::binary);
+	//ifstream ifile("15_49_43.px4log", ios::in | ios::binary);
 
 	//以写入和在文件末尾添加的方式打开.txt文件，没有的话就创建该文件。
-	ofstream ofile("loggong.txt", std::ios::out | std::ios::app); 
+	//ofstream ofile("loggong.txt", std::ios::out | std::ios::app); 
 
 	//  获取filestr对应buffer对象的指针   
-	streambuf *pbuf = ifile.rdbuf();
+	//streambuf *pbuf = ifile.rdbuf();
 
-	char buffer[8192];
+	//char buffer[8192];
 
 	// 将指针位置移动到第一个字节
-	pbuf->pubseekpos(0);
+	//pbuf->pubseekpos(0);
 
 	// 获取文件内容  
-	pbuf->sgetn(buffer, 8192);
+	//pbuf->sgetn(buffer, 8192);
 
-	char ch = pbuf->sgetc();
+	//char ch = pbuf->sgetc();
 
 	//int msg_type = PX4LogReader::readHeader(buffer);
+	PX4LogMessageDescription obj;
 
-	PX4LogMessageDescription obj(128, 33, "FMT", "fff", { "haha","xixi","hehe" });
-	int aa = obj.get_type();
-//	for(vector<string>::iterator iter = obj.fields.begin();)
-
-	ofile.close();
-	ifile.close();
+	//ofile.close();
+	//ifile.close();
 	return 0;
 
 }

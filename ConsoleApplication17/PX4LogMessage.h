@@ -1,7 +1,9 @@
 #pragma once
 #include "functions.h"
-#include "PX4LogMessageDescription.h"
+// #include "PX4LogMessageDescription.h"
 //#include<list>
+
+class PX4LogMessageDescription;
 
 class PX4LogMessage {
 private:

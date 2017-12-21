@@ -1,7 +1,5 @@
 #pragma once
-#include "functions.h"
 #include "PX4LogMessage.h"
-//using namespace std;
 
 
 class PX4LogMessageDescription {
@@ -54,13 +52,12 @@ public:
 		}
 	}
 	
-	PX4LogMessage *parseMessage(/*streambuf*/char* buffer) {
+	PX4LogMessage parseMessage(/*streambuf*/char* buffer) {
 
 		unsigned int size_format = format.size();
 		vector<boost::any> data(size_format);
-
 		char _format[16];
-		strcpy(_format, format.c_str());
+		strcpy_s(_format, format.c_str());
 		for (char f : _format) {
 			//char *v = new char[8];
 			static uint8_t ofs = 0;
@@ -156,9 +153,10 @@ public:
 			}
 			data.push_back(value);
 		}
-		PX4LogMessage *_Log_Message = new PX4LogMessage(this, data);
+		PX4LogMessage _Log_Message(this, data);
 		return _Log_Message;
 	}
+
 	int get_type() { return type; }
 	int get_length() { return length; }
 
@@ -173,4 +171,4 @@ private:
 };
 
 //PX4LogMessageDescription *FORMAT = new PX4LogMessageDescription(0x80, 89, (string)"FMT", (string)"BBnNZ", \
-{"Type", "Length", "Name", "Format", "Labels"});
+//{"Type", "Length", "Name", "Format", "Labels"});

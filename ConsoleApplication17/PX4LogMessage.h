@@ -1,20 +1,16 @@
 #pragma once
 #include "functions.h"
 #include "PX4LogMessageDescription.h"
-#include<list>
+//#include<list>
 
 class PX4LogMessage {
-//private:
+private:
 	PX4LogMessageDescription *description;
-	//template<typename T>
-	//list<T> data;
-	//list<string> data;
-	//vector<string> data;
 	vector<boost::any> data;
 
 public:
-	PX4LogMessage(PX4LogMessageDescription *_description, /*list<string>*/vector<boost::any> _data) {
-		this->description = _description;
-		this->data = _data;
+	PX4LogMessage(PX4LogMessageDescription *_description, vector<boost::any> _data) {
+		description = _description;
+		data = _data;
 	}
 };

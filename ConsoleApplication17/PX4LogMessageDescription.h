@@ -5,25 +5,25 @@
 
 
 class PX4LogMessageDescription {
-//private:
 
-	int type;
-	int length;
-	string name;
-	string format;
-	//string fields[16];
-	vector<string> fields;
-	unordered_map<string, int> fieldsMap;
+	//int type;
+	//int length;
+	//string name;
+	//string format;
+	//vector<string> fields;
+	//unordered_map<string, int> fieldsMap;
 
 public:
-
-	PX4LogMessageDescription(int _type, int _length, string _name, string _format, vector<string> _fields /*string _fields[16]*/) {
-		type = _type;
-		length = _length;
-		name = _name;
-		format = _format;
-		fields = _fields;
+	PX4LogMessageDescription() {
+		type = 0x80;
+		length = 89;
+		name = (string)"FMT";
+		format = (string)"BBnNZ";
+		fields = {"Type", "Length", "Name", "Format", "Labels"};
 	}
+
+	PX4LogMessageDescription(int _type, int _length, string _name, string _format, vector<string> _fields):\
+		type(_type), length(_length), name(_name), format(_format), fields(_fields){}
 
 	PX4LogMessageDescription(streambuf *buffer) {
 		type = buffer->sgetc() & 0xFF;
@@ -45,7 +45,7 @@ public:
 		//}
 		split(_fieldStr, fields, ",");
 		if ("FMT" != name) {
-			for (int j = 0; j < fields.size() - 1; j++) {
+			for (uint8_t j = 0; j < fields.size() - 1; j++) {
 				fieldsMap.insert({ fields[j],j });
 			}
 		}
@@ -53,10 +53,7 @@ public:
 			cout << "New message " << name << endl;
 		}
 	}
-
-	PX4LogMessageDescription *FORMAT = new PX4LogMessageDescription(0x80, 89, (string)"FMT", (string)"BBnNZ", \
-	{"Type", "Length", "Name", "Format", "Labels"});
-
+	
 	PX4LogMessage *parseMessage(/*streambuf*/char* buffer) {
 
 		unsigned int size_format = format.size();
@@ -91,31 +88,31 @@ public:
 			}
 			else if (f == 'I') {
 				//buffer.sgetn(v, 4);
-				value = _GET_uint32_t(buffer, ofs);
+				value = _GET_uint32_t(buffer, ofs) & 0xFFFFFFFF;
 				ofs += 4;
 			}
 			else if (f == 'b') {
-				//buffer.sgetn(v, 4);
+				//buffer.sgetn(v, 1);
 				value = _GET_int8_t(buffer, ofs);
 				ofs += 1;
 			}
 			else if (f == 'B' || f == 'M') {
-				//buffer.sgetn(v, 4);
-				value = _GET_uint8_t(buffer, ofs);
+				//buffer.sgetn(v, 1);
+				value = _GET_uint8_t(buffer, ofs) & 0xFF;
 				ofs += 1;
 			}
 			else if (f == 'L') { /* L -> int32 * 1e-7(lat/lon) */
 				//buffer.sgetn(v, 4);
-				value = _GET_int32_t(buffer, ofs);
+				value = _GET_int32_t(buffer, ofs) * 1e-7;
 				ofs += 4;
 			}
 			else if (f == 'h') {
-				//buffer.sgetn(v, 4);
+				//buffer.sgetn(v, 2);
 				value = _GET_int16_t(buffer, ofs);
 				ofs += 2;
 			}
 			else if (f == 'H') {
-				//buffer.sgetn(v, 4);
+				//buffer.sgetn(v, 2);
 				value = _GET_uint16_t(buffer, ofs);
 				ofs += 2;
 			}
@@ -125,28 +122,28 @@ public:
 				ofs += 4;
 			}
 			else if (f == 'N') {
-				//buffer.sgetn(v, 4);
+				//buffer.sgetn(v, 2);
 				memcpy(&value, &buffer[ofs], 16);
 				ofs += 16;
 			}
 			else if (f == 'Z') {
-				//buffer.sgetn(v, 4);
+				//buffer.sgetn(v, 8);
 				memcpy(&value, &buffer[ofs], 64);
 				ofs += 64;
 			}
 			else if (f == 'c') {
-				//buffer.sgetn(v, 4);
-				value = _GET_int16_t(buffer, ofs);
+				//buffer.sgetn(v, 2);
+				value = _GET_int16_t(buffer, ofs) * 1e-2;
 				ofs += 2;
 			}
 			else if (f == 'C') {
-				//buffer.sgetn(v, 4);
-				value = _GET_int16_t(buffer, ofs);
+				//buffer.sgetn(v, 2);
+				value = (_GET_int16_t(buffer, ofs) & 0xFFFF) * 1e-2;
 				ofs += 2;
 			}
 			else if (f == 'e') {
 				//buffer.sgetn(v, 4);
-				value = _GET_int32_t(buffer, ofs);
+				value = (_GET_int32_t(buffer, ofs) & 0xFFFFFFF) * 1e-2;
 				ofs += 4;
 			}
 			else if (f == 'E') {
@@ -162,7 +159,18 @@ public:
 		PX4LogMessage *_Log_Message = new PX4LogMessage(this, data);
 		return _Log_Message;
 	}
+	int get_type() { return type; }
+	int get_length() { return length; }
 
-
+private:
+	int type;
+	int length;
+	string name;
+	string format;
+	vector<string> fields;
+	unordered_map<string, int> fieldsMap;
 // End of Class
 };
+
+//PX4LogMessageDescription *FORMAT = new PX4LogMessageDescription(0x80, 89, (string)"FMT", (string)"BBnNZ", \
+{"Type", "Length", "Name", "Format", "Labels"});

@@ -1,10 +1,7 @@
 #include "functions.h"
-//#include "PX4LogMessageDescription.h"
-
+#include "PX4LogMessageDescription.h"
 
 using namespace std;
-
-
 
 class PX4LogReader {
 	int HEADER_LEN = 3;
@@ -38,7 +35,6 @@ public:
 		int byte2 = (int)buf[i++] & 0xFF;
 		int _msg_type = (int)buf[i++] & 0xFF;
 
-		//if (byte1 != HEAD_BYTE1 || byte2 != HEAD_BYTE1) {
 		if (byte1 != HEAD_BYTE1 || byte2 != HEAD_BYTE2) {
 			cerr << "wrong HEADER";
 			return -1;
@@ -49,7 +45,7 @@ public:
 		}
 	}
 
-private:
+//private:
 	//hideMsgs = new unordered_set<string>
 	//formatNames
 
@@ -72,8 +68,7 @@ unordered_map<string, string> PX4LogReader::formatNames = unordered_map<string, 
 																			{"n", "char[4]"}, \
 																			{"N", "char[16]"}, \
 																			{"Z", "char[64]"}, \
-																			{"M", "uint8 (mode)"}
-});
+																			{"M", "uint8 (mode)"}});
 
 //void readFormat(char *buf) {
 //	unordered_map<string, string> fieldsList;
@@ -103,13 +98,12 @@ int main() {
 
 	char ch = pbuf->sgetc();
 
-	//int msg_type = readHeader(buffer);
+	//int msg_type = PX4LogReader::readHeader(buffer);
 
-	char *cc = "aibuhdisuadhsuahfsa";
-	//string sttt =  _GET_string(cc, 0);
-	char sttt = _GET_char(cc, 0);
+	PX4LogMessageDescription obj(128, 33, "FMT", "fff", { "haha","xixi","hehe" });
+	int aa = obj.get_type();
+//	for(vector<string>::iterator iter = obj.fields.begin();)
 
-	cout << sttt << endl;
 	ofile.close();
 	ifile.close();
 	return 0;

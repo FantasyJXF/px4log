@@ -20,7 +20,6 @@ using namespace std;
 #define HEAD_BYTE1  0xA3    // Decimal 163
 #define HEAD_BYTE2  0x95    // Decimal 149
 
-
 /*
  * 字符串分隔
  */
@@ -91,7 +90,25 @@ _GET_RETURN_TYPE(int64_t, 8)
 _GET_RETURN_TYPE(float, 4)
 _GET_RETURN_TYPE(double, 8)
 
+string _GET_string_4(const char *msg, uint8_t ofs) {
+	char chs[4] = "";
+	memcpy(chs, &msg[ofs], 4);
+	string str = (string)chs;
+	return str;
+}
 
+string _GET_string_16(const char *msg, uint8_t ofs) {
+	char chs[16] = "";
+	memcpy(chs, &msg[ofs], 16);
+	string str = (string)chs;
+	return str;
+}
+
+char* _GET_char_ptr(const char* msg, uint8_t num, uint8_t ofs) {
+	char *dst = "";
+	memcpy(dst, &msg[ofs], num);
+	return dst;
+}
 
 //根据类型进行显示  
 // char(1)   int8_t(1)  int16_t(2)  int32_t(4)  int64_t(8)

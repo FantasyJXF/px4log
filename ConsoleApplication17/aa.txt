@@ -1,0 +1,12 @@
+The fields 
+
+qw
+qx
+qy
+qz
+Roll
+Pitch
+Yaw
+RollRate
+PitchRate
+YawRate

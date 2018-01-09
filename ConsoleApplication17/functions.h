@@ -104,8 +104,15 @@ string _GET_string_16(const char *msg, uint8_t ofs) {
 	return str;
 }
 
+string _GET_string_64(const char *msg, uint8_t ofs) {
+	char chs[64] = "";
+	memcpy(chs, &msg[ofs], 64);
+	string str = (string)chs;
+	return str;
+}
+
 char* _GET_char_ptr(const char* msg, uint8_t num, uint8_t ofs) {
-	char *dst = "";
+	static char dst[20];
 	memcpy(dst, &msg[ofs], num);
 	return dst;
 }
@@ -163,5 +170,58 @@ void show_list(list_any& la)
 			cout << boost::any_cast<double>(*iter) << endl;
 		else
 			cerr << "The data type is out of range" << endl;
+	}
+}
+
+typedef vector<boost::any> vector_any;
+void show_vector(vector_any& la)
+{
+	vector_any::iterator iter;
+	boost::any anyone;
+
+	for (iter = la.begin(); iter != la.end(); iter++)
+	{
+		anyone = *iter;
+
+		if (anyone.type() == typeid(char))
+			cout << boost::any_cast<char>(*iter) << endl;
+
+		else if (anyone.type() == typeid(char*))
+			cout << boost::any_cast<char*>(*iter) << endl;
+
+		else if (anyone.type() == typeid(string))
+			cout << boost::any_cast<string>(*iter) << endl;
+
+		else if (anyone.type() == typeid(int8_t))
+			cout << boost::any_cast<int8_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(uint8_t))
+			cout << boost::any_cast<uint8_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(int16_t))
+			cout << boost::any_cast<int8_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(uint16_t))
+			cout << boost::any_cast<uint16_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(int32_t))
+			cout << boost::any_cast<int32_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(uint32_t))
+			cout << boost::any_cast<uint32_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(int64_t))
+			cout << boost::any_cast<int64_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(uint64_t))
+			cout << boost::any_cast<uint64_t>(*iter) << endl;
+
+		else if (anyone.type() == typeid(float))
+			cout << boost::any_cast<float>(*iter) << endl;
+
+		else if (anyone.type() == typeid(double))
+			cout << boost::any_cast<double>(*iter) << endl;
+		else
+			cerr << "The data type is out of range  666" << endl;
 	}
 }

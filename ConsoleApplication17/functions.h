@@ -8,7 +8,6 @@
 #include<fstream>  
 #include<boost/any.hpp>
 
-
 using namespace std;
 
 #define LOG_PACKET_HEADER_LEN	   3
@@ -31,14 +30,14 @@ void split(const string& src, vector<string>& dst, const string& sprt)
 	while (string::npos != pos2)
 	{
 		dst.push_back(src.substr(pos1, pos2 - pos1));
-
 		pos1 = pos2 + sprt.size();
 		pos2 = src.find(sprt, pos1);
 	}
-	if (pos1 != src.length())
-		dst.push_back(src.substr(pos1));
-}
 
+	if (pos1 != src.length()) {
+		dst.push_back(src.substr(pos1));
+	}	
+}
 
 /*
  * 获取特定类型的数据
@@ -221,6 +220,7 @@ void show_vector(vector_any& la)
 
 		else if (anyone.type() == typeid(double))
 			cout << boost::any_cast<double>(*iter) << endl;
+
 		else
 			cerr << "The data type is out of range  666" << endl;
 	}

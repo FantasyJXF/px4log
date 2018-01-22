@@ -1,11 +1,10 @@
 #pragma once
 #include "PX4LogMessage.h"
 
-
 class PX4LogMessageDescription {
 public:
-	uint8_t  type;
-	uint8_t  length;
+	uint8_t type;
+	uint8_t length;
 	string name;
 	string format;
 	vector<string> fields;
@@ -25,13 +24,6 @@ public:
 	PX4LogMessageDescription(streambuf *buffer);
 
 	PX4LogMessage* parseMessage(/*streambuf*/char *buffer);
-
-	//uint8_t  get_type() { return type; }
-	//uint8_t  get_length() { return length; }
-	//string   get_name() { return name; }
-
-//private:
-
 // End of Class
 };
 
@@ -72,7 +64,7 @@ PX4LogMessageDescription::PX4LogMessageDescription(streambuf *buffer) {
 	string fieldsStr = _fieldsStr;
 	split(fieldsStr, fields, ",");
 	if ("FMT" != name) {
-		for (uint8_t j = 0; j < fields.size() - 1; j++) {
+		for (uint8_t j = 0; j < fields.size(); j++) {
 			fieldsMap.insert({ fields[j],j });
 		}
 	}
@@ -168,10 +160,7 @@ PX4LogMessageDescription::PX4LogMessageDescription(streambuf *buffer) {
 //}
 
 PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
-	//unsigned int size_format = format.size();
-	//vector<boost::any> data(size_format);
-	//cout << "The size is "<<size_format << endl;
-	vector<boost::any> data;
+	vector<boost::any> _data;
 	static uint8_t ofs = 0;
 	boost::any value;
 	char _format[16];
@@ -180,7 +169,7 @@ PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
 		if (f == 'f') {
 			value = _GET_float(buffer, ofs);
 			ofs += 4;
-			cout << boost::any_cast<float>(value) << endl;
+		//	cout << boost::any_cast<float>(value) << endl;
 		}
 		else if (f == 'q') {
 			value = _GET_int64_t(buffer, ofs);
@@ -254,12 +243,12 @@ PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
 		else {
 			cerr << "Invalid format char in message " << name << endl;
 		}
-		data.push_back(value);
+		_data.push_back(value);
 	}
 	//cout << data.size() << endl;
 	// ÏÔÊ¾Êý¾Ý
-	show_vector(data);
-	PX4LogMessage *_Log_Message = new PX4LogMessage(this, data);
+	show_vector(_data);
+	PX4LogMessage *_Log_Message = new PX4LogMessage(this, _data);
 	return _Log_Message;
 }
 

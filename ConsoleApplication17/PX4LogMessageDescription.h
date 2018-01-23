@@ -161,10 +161,11 @@ PX4LogMessageDescription::PX4LogMessageDescription(streambuf *buffer) {
 
 PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
 	vector<boost::any> _data;
-	static uint8_t ofs = 0;
+	uint8_t ofs = 0;
 	boost::any value;
-	char _format[16];
-	strcpy_s(_format, format.c_str());
+	char _format[40];
+	uint8_t len = strlen(format.c_str()) + 1;
+	strcpy_s(_format, len, format.c_str());
 	for (char f : _format) {
 		if (f == 'f') {
 			value = _GET_float(buffer, ofs);

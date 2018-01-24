@@ -20,7 +20,7 @@ class PX4LogReader {
 	unordered_map<string, float> parameters;
 	string tsName;
 	bool tsMicros;
-
+	uint64_t position = 0;
 	static unordered_set<string> hideMsgs;
 	static unordered_map<char, string> formatNames;
 	
@@ -49,6 +49,15 @@ public:
 
 	/* 读取日志消息 */
 	PX4LogMessage* readMessage(streambuf *buf);
+
+	/* 应用消息 */
+	void applyMsg(unordered_map<string, boost::any> update, PX4LogMessage *msg);
+
+	/* 读取更新 */
+	uint64_t readUpdate(unordered_map<string, boost::any> update, streambuf *buf);
+
+	/* 读取目标字段 */
+	void getField(string field, streambuf *buf, vector<boost::any> vaules);
 };
 
 unordered_set<string> PX4LogReader::hideMsgs = unordered_set<string>({ "PARM", "FMT", "TIME", "VER" });
@@ -90,7 +99,7 @@ streambuf* PX4LogReader::read_all(string filename) {
 
 uint8_t PX4LogReader::readHeader(streambuf *buf) {
 	uint8_t byte1 = buf->sbumpc() & 0xFF;
-	if ('\0' == byte1) {
+	if (0xFF == byte1) {
 		cout << "hehehehe" << endl;
 	}
 	uint8_t byte2 = buf->sbumpc() & 0xFF;
@@ -231,15 +240,6 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		// 时间范围
 		if ("TIME" == Name) {
 			uint64_t t = boost::any_cast<uint64_t>(msg->data[0]);
-			//	unordered_map<string, int>::const_iterator got1 = msg->description->fieldsMap.find("FwGit");
-			//	if (got1 == msg->description->fieldsMap.end()) {
-			//		cout << "FwGit" << " not found" << endl;
-			//	}
-			//	else {
-			//		int idx1 = got1->second;
-			//		fw = boost::any_cast<string>(msg->data[idx1]);
-			//		version.insert({ "FW", fw });
-			//	}
 			time = t;
 			if (timeStart < 0) {
 				timeStart = t;
@@ -251,89 +251,89 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 
 		// Version
 		// 版本
-		//if ("VER" == Name) {
-		//	string fw, hw;
-		//	unordered_map<string, int>::const_iterator got1 = msg->description->fieldsMap.find("FwGit");
-		//	if (got1 == msg->description->fieldsMap.end()) {
-		//		cout << "FwGit" << " not found" << endl;
-		//	}
-		//	else {
-		//		int idx1 = got1->second;
-		//		fw = boost::any_cast<string>(msg->data[idx1]);
-		//		version.insert({ "FW", fw });
-		//	}
+		if ("VER" == Name) {
+			string fw, hw;
+			unordered_map<string, int>::const_iterator got1 = msg->description->fieldsMap.find("FwGit");
+			if (got1 == msg->description->fieldsMap.end()) {
+				cout << "FwGit" << " not found" << endl;
+			}
+			else {
+				int idx1 = got1->second;
+				fw = boost::any_cast<string>(msg->data[idx1]);
+				version.insert({ "FW", fw });
+			}
 
-		//	unordered_map<string, int>::const_iterator got2 = msg->description->fieldsMap.find("Arch");
-		//	if (got2 == msg->description->fieldsMap.end()) {
-		//		cout << "Arch" << " not found" << endl;
-		//	}
-		//	else {
-		//		int idx2 = got2->second;
-		//		hw = boost::any_cast<string>(msg->data[idx2]);
-		//		version.insert({ "HW", hw });
-		//	}
-		//	//cout<< "Data of VER" << endl;
-		//	//show_vector(msg->data);
-		//}
+			unordered_map<string, int>::const_iterator got2 = msg->description->fieldsMap.find("Arch");
+			if (got2 == msg->description->fieldsMap.end()) {
+				cout << "Arch" << " not found" << endl;
+			}
+			else {
+				int idx2 = got2->second;
+				hw = boost::any_cast<string>(msg->data[idx2]);
+				version.insert({ "HW", hw });
+			}
+			//cout<< "Data of VER" << endl;
+			//show_vector(msg->data);
+		}
 
 		// Parameters
 		// 参数		
-		//if ("PARM" == Name) {
-		//	string _name; // 写入时是char[16]
-		//	float _value;
-		//	boost::any anyone;
-		//	
-		//	unordered_map<string, int>::const_iterator got3 = msg->description->fieldsMap.find("Name");
-		//	if (got3 == msg->description->fieldsMap.end()) {
-		//		cout << "Name" << " not found" << endl;
-		//	}
-		//	else {
-		//		int idx3 = got3->second;
-		//		_name = boost::any_cast<string>(msg->data[idx3]);
-		//	}
+		if ("PARM" == Name) {
+			string _name; // 写入时是char[16]
+			float _value;
+			boost::any anyone;
+			
+			unordered_map<string, int>::const_iterator got3 = msg->description->fieldsMap.find("Name");
+			if (got3 == msg->description->fieldsMap.end()) {
+				cout << "Name" << " not found" << endl;
+			}
+			else {
+				int idx3 = got3->second;
+				_name = boost::any_cast<string>(msg->data[idx3]);
+			}
 
-		//	unordered_map<string, int>::const_iterator got4 = msg->description->fieldsMap.find("Value");
-		//	if (got4 == msg->description->fieldsMap.end()) {
-		//		cout << "Value" << " not found" << endl;
-		//	}
-		//	else {
-		//		int idx4 = got4->second;
-		//		_value = boost::any_cast<float>(msg->data[idx4]);
-		//	}
-		//	parameters.insert({ _name,_value });
-		//	//cout << "Data of Parameters" << endl;
-		//	//show_vector(msg->data);
-		//}
+			unordered_map<string, int>::const_iterator got4 = msg->description->fieldsMap.find("Value");
+			if (got4 == msg->description->fieldsMap.end()) {
+				cout << "Value" << " not found" << endl;
+			}
+			else {
+				int idx4 = got4->second;
+				_value = boost::any_cast<float>(msg->data[idx4]);
+			}
+			parameters.insert({ _name,_value });
+			//cout << "Data of Parameters" << endl;
+			//show_vector(msg->data);
+		}
 
 		// GPS
 		// GPS时间信息
-		//if ("GPS" == Name) {
-		//	if (utcTimeReference < 0) {
-		//		uint8_t fix;
-		//		uint64_t gpsT;
-		//		unordered_map<string, int>::const_iterator got5 = msg->description->fieldsMap.find("Fix");
-		//		if (got5 == msg->description->fieldsMap.end()) {
-		//			cout << "Fix" << " not found" << endl;
-		//		}
-		//		else {
-		//			int idx5 = got5->second;
-		//			fix = boost::any_cast<uint8_t>(msg->data[idx5]);
-		//		}
+		if ("GPS" == Name) {
+			if (utcTimeReference < 0) {
+				int fix = 0;
+				uint64_t gpsT;
+				unordered_map<string, int>::const_iterator got5 = msg->description->fieldsMap.find("Fix");
+				if (got5 == msg->description->fieldsMap.end()) {
+					cout << "Fix" << " not found" << endl;
+				}
+				else {
+					int idx5 = got5->second;
+					fix = boost::any_cast<int>(msg->data[idx5]);
+				}
 
-		//		unordered_map<string, int>::const_iterator got6 = msg->description->fieldsMap.find("GPSTime");
-		//		if (got6 == msg->description->fieldsMap.end()) {
-		//			cout << "GPSTime" << " not found" << endl;
-		//		}
-		//		else {
-		//			int idx6 = got6->second;
-		//			gpsT = boost::any_cast<uint64_t>(msg->data[idx6]);
-		//		}
+				unordered_map<string, int>::const_iterator got6 = msg->description->fieldsMap.find("GPSTime");
+				if (got6 == msg->description->fieldsMap.end()) {
+					cout << "GPSTime" << " not found" << endl;
+				}
+				else {
+					int idx6 = got6->second;
+					gpsT = boost::any_cast<uint64_t>(msg->data[idx6]);
+				}
 
-		//		if (fix >= 3 && gpsT > 0) {
-		//			utcTimeReference = gpsT - timeEnd; // 当GPS状态良好时获得UTC的时间参考
-		//		}
-		//	}
-		//}
+				if (fix >= 3 && gpsT > 0) {
+					utcTimeReference = gpsT - timeEnd; // 当GPS状态良好时获得UTC的时间参考
+				}
+			}
+		}
 	}
 	startMicroseconds = timeStart; // 解锁时的时间
 	sizeUpdates = packetsNum;
@@ -387,6 +387,111 @@ bool PX4LogReader::seek(streambuf *buf,uint64_t seekTime) {
 			// 跳过此消息
 			//buffer.position(buffer.position() + bodyLen);
 			cout << "skip the message" << endl;
+		}
+	}
+}
+
+void PX4LogReader::applyMsg(unordered_map<string, boost::any> update, PX4LogMessage *msg) {
+	vector<string> fields = msg->description->fields;
+	for (size_t i = 0; i < fields.size(); i++) {
+		string field = fields[i];
+		update.insert({ msg->description->name + "." + field, msg->data[i] });
+	}
+}
+
+uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, streambuf *buf) {
+	uint64_t t = time;
+	if (lastMsg != NULL) {
+		applyMsg(update, lastMsg);
+		lastMsg = NULL;
+	}
+
+	while (true) {
+		PX4LogMessageDescription messageDescription;
+		int msgType = readHeader(buf); // 读取消息头  获得消息ID
+									   //long pos = buf->pubseekpos();// 当前位置
+									   // 通过消息ID获取消息的描述：字段、数据类型、
+		unordered_map<uint8_t, PX4LogMessageDescription>::const_iterator got = messageDescriptions.find(msgType);
+		if (got == messageDescriptions.end()) {
+			cout << "msgType " << msgType << " not found" << endl;
+		}
+		else {
+			messageDescription = got->second;
+		}
+
+		if (&messageDescription == NULL) {
+			cerr << "Unknown message type: " << msgType << endl;
+			continue;
+		}
+
+		// 将一种消息的数据所占长度字符串写入buffer
+		uint8_t len = messageDescription.length - HEADER_LEN;
+		char *buffer = new char[len];
+		buf->sgetn(buffer, len);
+		PX4LogMessage *msg = messageDescription.parseMessage(buffer); // 返回消息与数据
+		//PX4LogMessage msg = readMessage();
+		if (msg == NULL) {
+			continue;
+		}
+
+		if ("TIME" == msg->description->name) {
+			time = boost::any_cast<uint64_t>(msg->data[0]);
+			if (t == 0) {
+				// The first TIME message
+				t = time;
+				continue;
+			}
+			break;
+		}
+		applyMsg(update, msg);
+	}
+	return t;
+}
+
+void PX4LogReader::getField(string field, streambuf *buf, vector<boost::any> vaules) {
+	uint64_t pos = dataStart;
+	vector<string> _name;
+	split(field, _name, ".");
+	for (uint8_t j = 0; j < _name.size(); j++) {
+		cout << _name[j] << endl;
+	}
+
+	while (true) {
+		unordered_map<string, vector<boost::any>> update;
+		PX4LogMessageDescription messageDescription;
+		int msgType = readHeader(buf); // 读取消息头  获得消息ID
+									   //long pos = buf->pubseekpos();// 当前位置
+		// 通过消息ID获取消息的描述：字段、数据类型、
+		unordered_map<uint8_t, PX4LogMessageDescription>::const_iterator got = messageDescriptions.find(msgType);
+
+		if (got == messageDescriptions.end()) {
+			cout << "msgType " << msgType << " not found" << endl;
+		}
+		else {
+			messageDescription = got->second;
+		}
+
+		if (_name[0] != messageDescription.name) {
+			pos += messageDescription.length - HEADER_LEN;
+			buf->pubseekpos(pos);
+			continue;
+		}
+		else {
+			// 将一种消息的数据所占长度字符串写入buffer
+			uint8_t len = messageDescription.length - HEADER_LEN;
+			char *buffer = new char[len];
+			buf->sgetn(buffer, len);
+			PX4LogMessage *msg = messageDescription.parseMessage(buffer); // 返回消息与数据
+
+			vector<string> _fields = msg->description->fields;
+			for (size_t i = 0; i < _fields.size(); i++) {
+				string field = _fields[i];
+				if (field == _name[1]) {
+					vaules.push_back(msg->data[i]);
+					//update.insert({ msg->description->name + "." + field, vaules });
+					update.insert({field, vaules});
+				}
+			}
 		}
 	}
 }

@@ -145,7 +145,7 @@ void show_list(list_any& la)
 			cout << boost::any_cast<uint8_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int16_t))
-			cout << boost::any_cast<int8_t>(*iter) << endl;
+			cout << boost::any_cast<int16_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint16_t))
 			cout << boost::any_cast<uint16_t>(*iter) << endl;

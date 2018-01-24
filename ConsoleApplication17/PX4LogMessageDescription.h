@@ -164,7 +164,7 @@ PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
 	uint8_t ofs = 0;
 	boost::any value;
 	char _format[40];
-	uint8_t len = strlen(format.c_str()) + 1;
+	size_t len = strlen(format.c_str()) + 1;
 	strcpy_s(_format, len, format.c_str());
 	for (char f : _format) {
 		if (f == 'f') {
@@ -242,13 +242,14 @@ PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
 			break;
 		}
 		else {
-			cerr << "Invalid format char in message " << name << endl;
+			//cerr << "Invalid format char in message " << name << endl;
+			break;
 		}
 		_data.push_back(value);
 	}
 	//cout << data.size() << endl;
 	// ÏÔÊ¾Êý¾Ý
-	show_vector(_data);
+	//show_vector(_data);
 	PX4LogMessage *_Log_Message = new PX4LogMessage(this, _data);
 	return _Log_Message;
 }

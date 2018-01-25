@@ -1,4 +1,8 @@
 #pragma once
+/**
+* 一些公用函数 以及 暂时不明确如何分类的定义
+*/
+
 #include<iostream>
 #include<string>
 #include<unordered_map>
@@ -10,6 +14,14 @@
 
 using namespace std;
 
+class EOFException : public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "End of File";
+	}
+} eof_exception;
+
 #define LOG_PACKET_HEADER_LEN	   3
 #define LOG_PACKET_HEADER	       uint8_t head1, head2, msg_type;
 #define LOG_PACKET_HEADER_INIT(id) .head1 = HEAD_BYTE1, .head2 = HEAD_BYTE2, .msg_type = id
@@ -18,6 +30,14 @@ using namespace std;
 // this header
 #define HEAD_BYTE1  0xA3    // Decimal 163
 #define HEAD_BYTE2  0x95    // Decimal 149
+
+class myexception : public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "My exception happened";
+	}
+} myex;
 
 /*
  * 字符串分隔

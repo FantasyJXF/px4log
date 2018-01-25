@@ -99,12 +99,13 @@ streambuf* PX4LogReader::read_all(string filename) {
 
 uint8_t PX4LogReader::readHeader(streambuf *buf) {
 	uint8_t byte1 = buf->sbumpc() & 0xFF;
-	if (0xFF == byte1) {
-		cout << "hehehehe" << endl;
-	}
 	uint8_t byte2 = buf->sbumpc() & 0xFF;
-	uint8_t _msg_type = buf->sbumpc() & 0xFF;
+	if (0xFF == byte1 && 0xFF == byte2) {
+		//cout << "Here the file ends" << endl;
+		throw eof_exception;
+	}
 
+	uint8_t _msg_type = buf->sbumpc() & 0xFF;
 	if (byte1 != HEAD_BYTE1 || byte2 != HEAD_BYTE2) {
 		cerr << "wrong HEADER";
 		return -1;
@@ -202,8 +203,8 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 	bool parseVersion = true;
 	string versionStr;
 	while (true) {
-		//PX4LogMessage *msg;
-		//if (true) {
+		PX4LogMessage *msg;
+		try {
 			PX4LogMessageDescription messageDescription;
 			int msgType = readHeader(buf); // 读取消息头  获得消息ID
 			//long pos = buf->pubseekpos();// 当前位置
@@ -225,13 +226,14 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			uint8_t len = messageDescription.length - HEADER_LEN;
 			char *buffer = new char[len];
 			buf->sgetn(buffer, len);
-			PX4LogMessage *msg = messageDescription.parseMessage(buffer); // 返回消息与数据
+			//PX4LogMessage *
+				msg = messageDescription.parseMessage(buffer); // 返回消息与数据
 			//PX4LogMessage* msg = readMessage(buf);
-		//}
-		//else {
-		//	cout << "End of file" << endl;
-		//	break;
-		//}
+		}
+		catch (std::exception& e){
+			cout << "End of file" << endl;
+			break;
+		}
 
 		string Name = (msg->description->name).substr(0, 4);
 		//show_vector(msg->data);

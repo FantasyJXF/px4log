@@ -150,6 +150,7 @@
     <ClCompile Include="PX4LogReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="boost_any.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="PX4LogMessage.h" />
     <ClInclude Include="PX4LogMessageDescription.h" />

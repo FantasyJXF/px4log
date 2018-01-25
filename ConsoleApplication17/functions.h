@@ -6,8 +6,10 @@
 #include<vector>
 #include<iomanip>
 #include<fstream>  
-#include<boost/any.hpp>
+//#include<boost/any.hpp>
+#include "boost_any.h"
 
+namespace bst = my_boost; // bst为命名空间boost的简写
 using namespace std;
 
 #define LOG_PACKET_HEADER_LEN	   3
@@ -119,107 +121,107 @@ char* _GET_char_ptr(const char* msg, uint8_t num, uint8_t ofs) {
 //根据类型进行显示  
 // char(1)   int8_t(1)  int16_t(2)  int32_t(4)  int64_t(8)
 // float(4)  double(8)  
-typedef list<boost::any> list_any;
+typedef list<bst::any> list_any;
 void show_list(list_any& la)
 {
 	list_any::iterator iter;
-	boost::any anyone;
+	bst::any anyone;
 
 	for (iter = la.begin(); iter != la.end(); iter++)
 	{
 		anyone = *iter;
 
 		if (anyone.type() == typeid(char))
-			cout << boost::any_cast<char>(*iter) << endl;
+			cout << bst::any_cast<char>(*iter) << endl;
 
 		else if (anyone.type() == typeid(char*))
-			cout << boost::any_cast<char*>(*iter) << endl;
+			cout << bst::any_cast<char*>(*iter) << endl;
 
 		else if (anyone.type() == typeid(string))
-			cout << boost::any_cast<string>(*iter) << endl;
+			cout << bst::any_cast<string>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int8_t))
-			cout << boost::any_cast<int8_t>(*iter) << endl;
+			cout << bst::any_cast<int8_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint8_t))
-			cout << boost::any_cast<uint8_t>(*iter) << endl;
+			cout << bst::any_cast<uint8_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int16_t))
-			cout << boost::any_cast<int16_t>(*iter) << endl;
+			cout << bst::any_cast<int16_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint16_t))
-			cout << boost::any_cast<uint16_t>(*iter) << endl;
+			cout << bst::any_cast<uint16_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int32_t))
-			cout << boost::any_cast<int32_t>(*iter) << endl;
+			cout << bst::any_cast<int32_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint32_t))
-			cout << boost::any_cast<uint32_t>(*iter) << endl;
+			cout << bst::any_cast<uint32_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int64_t))
-			cout << boost::any_cast<int64_t>(*iter) << endl;
+			cout << bst::any_cast<int64_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint64_t))
-			cout << boost::any_cast<uint64_t>(*iter) << endl;
+			cout << bst::any_cast<uint64_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(float))
-			cout << boost::any_cast<float>(*iter) << endl;
+			cout << bst::any_cast<float>(*iter) << endl;
 
 		else if (anyone.type() == typeid(double))
-			cout << boost::any_cast<double>(*iter) << endl;
+			cout << bst::any_cast<double>(*iter) << endl;
 		else
 			cerr << "The data type is out of range" << endl;
 	}
 }
 
-typedef vector<boost::any> vector_any;
+typedef vector<bst::any> vector_any;
 void show_vector(vector_any& la)
 {
 	vector_any::iterator iter;
-	boost::any anyone;
+	bst::any anyone;
 
 	for (iter = la.begin(); iter != la.end(); iter++)
 	{
 		anyone = *iter;
 
 		if (anyone.type() == typeid(char))
-			cout << boost::any_cast<char>(*iter) << endl;
+			cout << bst::any_cast<char>(*iter) << endl;
 
 		else if (anyone.type() == typeid(char*))
-			cout << boost::any_cast<char*>(*iter) << endl;
+			cout << bst::any_cast<char*>(*iter) << endl;
 
 		else if (anyone.type() == typeid(string))
-			cout << boost::any_cast<string>(*iter) << endl;
+			cout << bst::any_cast<string>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int8_t))
-			cout << boost::any_cast<int8_t>(*iter) << endl;
+			cout << bst::any_cast<int8_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint8_t))
-			cout << boost::any_cast<uint8_t>(*iter) << endl;
+			cout << bst::any_cast<uint8_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int16_t))
-			cout << boost::any_cast<int16_t>(*iter) << endl;
+			cout << bst::any_cast<int16_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint16_t))
-			cout << boost::any_cast<uint16_t>(*iter) << endl;
+			cout << bst::any_cast<uint16_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int32_t))
-			cout << boost::any_cast<int32_t>(*iter) << endl;
+			cout << bst::any_cast<int32_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint32_t))
-			cout << boost::any_cast<uint32_t>(*iter) << endl;
+			cout << bst::any_cast<uint32_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(int64_t))
-			cout << boost::any_cast<int64_t>(*iter) << endl;
+			cout << bst::any_cast<int64_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(uint64_t))
-			cout << boost::any_cast<uint64_t>(*iter) << endl;
+			cout << bst::any_cast<uint64_t>(*iter) << endl;
 
 		else if (anyone.type() == typeid(float))
-			cout << boost::any_cast<float>(*iter) << endl;
+			cout << bst::any_cast<float>(*iter) << endl;
 
 		else if (anyone.type() == typeid(double))
-			cout << boost::any_cast<double>(*iter) << endl;
+			cout << bst::any_cast<double>(*iter) << endl;
 
 		else
 			cerr << "The data type is out of range  666" << endl;

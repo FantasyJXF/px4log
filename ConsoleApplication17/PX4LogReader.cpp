@@ -51,13 +51,13 @@ public:
 	PX4LogMessage* readMessage(streambuf *buf);
 
 	/* 应用消息 */
-	void applyMsg(unordered_map<string, boost::any> update, PX4LogMessage *msg);
+	void applyMsg(unordered_map<string, bst::any> update, PX4LogMessage *msg);
 
 	/* 读取更新 */
-	uint64_t readUpdate(unordered_map<string, boost::any> update, streambuf *buf);
+	uint64_t readUpdate(unordered_map<string, bst::any> update, streambuf *buf);
 
 	/* 读取目标字段 */
-	void getField(string field, streambuf *buf, vector<boost::any> vaules);
+	void getField(string field, streambuf *buf, vector<bst::any> vaules);
 };
 
 unordered_set<string> PX4LogReader::hideMsgs = unordered_set<string>({ "PARM", "FMT", "TIME", "VER" });
@@ -100,7 +100,7 @@ streambuf* PX4LogReader::read_all(string filename) {
 uint8_t PX4LogReader::readHeader(streambuf *buf) {
 	uint8_t byte1 = buf->sbumpc() & 0xFF;
 	if (0xFF == byte1) {
-		cout << "hehehehe" << endl;
+		cout << "Hits the End" << endl;
 	}
 	uint8_t byte2 = buf->sbumpc() & 0xFF;
 	uint8_t _msg_type = buf->sbumpc() & 0xFF;
@@ -239,7 +239,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		// TIME
 		// 时间范围
 		if ("TIME" == Name) {
-			uint64_t t = boost::any_cast<uint64_t>(msg->data[0]);
+			uint64_t t = bst::any_cast<uint64_t>(msg->data[0]);
 			time = t;
 			if (timeStart < 0) {
 				timeStart = t;
@@ -259,7 +259,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx1 = got1->second;
-				fw = boost::any_cast<string>(msg->data[idx1]);
+				fw = bst::any_cast<string>(msg->data[idx1]);
 				version.insert({ "FW", fw });
 			}
 
@@ -269,7 +269,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx2 = got2->second;
-				hw = boost::any_cast<string>(msg->data[idx2]);
+				hw = bst::any_cast<string>(msg->data[idx2]);
 				version.insert({ "HW", hw });
 			}
 			//cout<< "Data of VER" << endl;
@@ -281,7 +281,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		if ("PARM" == Name) {
 			string _name; // 写入时是char[16]
 			float _value;
-			boost::any anyone;
+			bst::any anyone;
 			
 			unordered_map<string, int>::const_iterator got3 = msg->description->fieldsMap.find("Name");
 			if (got3 == msg->description->fieldsMap.end()) {
@@ -289,7 +289,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx3 = got3->second;
-				_name = boost::any_cast<string>(msg->data[idx3]);
+				_name = bst::any_cast<string>(msg->data[idx3]);
 			}
 
 			unordered_map<string, int>::const_iterator got4 = msg->description->fieldsMap.find("Value");
@@ -298,7 +298,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx4 = got4->second;
-				_value = boost::any_cast<float>(msg->data[idx4]);
+				_value = bst::any_cast<float>(msg->data[idx4]);
 			}
 			parameters.insert({ _name,_value });
 			//cout << "Data of Parameters" << endl;
@@ -317,7 +317,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 				}
 				else {
 					int idx5 = got5->second;
-					fix = boost::any_cast<int>(msg->data[idx5]);
+					fix = bst::any_cast<int>(msg->data[idx5]);
 				}
 
 				unordered_map<string, int>::const_iterator got6 = msg->description->fieldsMap.find("GPSTime");
@@ -326,7 +326,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 				}
 				else {
 					int idx6 = got6->second;
-					gpsT = boost::any_cast<uint64_t>(msg->data[idx6]);
+					gpsT = bst::any_cast<uint64_t>(msg->data[idx6]);
 				}
 
 				if (fix >= 3 && gpsT > 0) {
@@ -373,7 +373,7 @@ bool PX4LogReader::seek(streambuf *buf,uint64_t seekTime) {
 		if ("TIME" == messageDescription.name) {
 			PX4LogMessage *msg = messageDescription.parseMessage(buffer);
 			uint64_t t = 0;
-			t = boost::any_cast<uint64_t>(msg->data);
+			t = bst::any_cast<uint64_t>(msg->data[0]);
 			if (t > seekTime) {
 				// Time found
 				time = t;
@@ -391,7 +391,7 @@ bool PX4LogReader::seek(streambuf *buf,uint64_t seekTime) {
 	}
 }
 
-void PX4LogReader::applyMsg(unordered_map<string, boost::any> update, PX4LogMessage *msg) {
+void PX4LogReader::applyMsg(unordered_map<string, bst::any> update, PX4LogMessage *msg) {
 	vector<string> fields = msg->description->fields;
 	for (size_t i = 0; i < fields.size(); i++) {
 		string field = fields[i];
@@ -399,7 +399,7 @@ void PX4LogReader::applyMsg(unordered_map<string, boost::any> update, PX4LogMess
 	}
 }
 
-uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, streambuf *buf) {
+uint64_t PX4LogReader::readUpdate(unordered_map<string, bst::any> update, streambuf *buf) {
 	uint64_t t = time;
 	if (lastMsg != NULL) {
 		applyMsg(update, lastMsg);
@@ -435,7 +435,7 @@ uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, stre
 		}
 
 		if ("TIME" == msg->description->name) {
-			time = boost::any_cast<uint64_t>(msg->data[0]);
+			time = bst::any_cast<uint64_t>(msg->data[0]);
 			if (t == 0) {
 				// The first TIME message
 				t = time;
@@ -448,7 +448,7 @@ uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, stre
 	return t;
 }
 
-void PX4LogReader::getField(string field, streambuf *buf, vector<boost::any> vaules) {
+void PX4LogReader::getField(string field, streambuf *buf, vector<bst::any> vaules) {
 	uint64_t pos = dataStart;
 	vector<string> _name;
 	split(field, _name, ".");
@@ -457,7 +457,7 @@ void PX4LogReader::getField(string field, streambuf *buf, vector<boost::any> vau
 	}
 
 	while (true) {
-		unordered_map<string, vector<boost::any>> update;
+		unordered_map<string, vector<bst::any>> update;
 		PX4LogMessageDescription messageDescription;
 		int msgType = readHeader(buf); // 读取消息头  获得消息ID
 									   //long pos = buf->pubseekpos();// 当前位置

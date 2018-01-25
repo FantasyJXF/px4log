@@ -76,79 +76,79 @@ PX4LogMessageDescription::PX4LogMessageDescription(streambuf *buffer) {
 //PX4LogMessage PX4LogMessageDescription::parseMessage(streambuf *buffer) {
 //
 //	unsigned int size_format = format.size();
-//	vector<boost::any> data(size_format);
+//	vector<bst::any> data(size_format);
 //	char _format[16];
 //	strcpy_s(_format, format.c_str());
 //	for (char f : _format) {
 //		char *v = new char[64];
-//		boost::any value;
+//		bst::any value;
 //		if (f == 'f') { /* float */
 //			buffer->sgetn(v,4);
-//			value = boost::any_cast<float>(v);
+//			value = bst::any_cast<float>(v);
 //		}
 //		else if (f == 'q') { /* int64_t */
 //			buffer->sgetn(v, 8);
-//			value = boost::any_cast<int64_t>(v);
+//			value = bst::any_cast<int64_t>(v);
 //		} 
 //		else if (f == 'Q') { /* uint64_t */
 //			buffer->sgetn(v, 8);
-//			value = boost::any_cast<uint64_t>(v);
+//			value = bst::any_cast<uint64_t>(v);
 //		}
 //		else if (f == 'i') { /* int32_t */
 //			buffer->sgetn(v, 4);
-//			value = boost::any_cast<int32_t>(v);
+//			value = bst::any_cast<int32_t>(v);
 //		}
 //		else if (f == 'I') { /* uint32_t */
 //			buffer->sgetn(v, 4);
-//			value = boost::any_cast<uint32_t>(v) & 0xFFFFFFFF;
+//			value = bst::any_cast<uint32_t>(v) & 0xFFFFFFFF;
 //		}
 //		else if (f == 'b') { /* int8_t */
 //			buffer->sgetn(v, 1);
-//			value = boost::any_cast<int8_t>(v);
+//			value = bst::any_cast<int8_t>(v);
 //		}
 //		else if (f == 'B' || f == 'M') { /* uint8_t */
 //			buffer->sgetn(v, 1);
-//			value = boost::any_cast<uint8_t>(v) & 0xFF;
+//			value = bst::any_cast<uint8_t>(v) & 0xFF;
 //		}
 //		else if (f == 'L') { /* L -> int32 * 1e-7(lat/lon) */
 //			buffer->sgetn(v, 4);
-//			value = boost::any_cast<int32_t>(v) * 1e-7;
+//			value = bst::any_cast<int32_t>(v) * 1e-7;
 //		}
 //		else if (f == 'h') { /* int16_t */
 //			buffer->sgetn(v, 2);
-//			value = boost::any_cast<int16_t>(v);
+//			value = bst::any_cast<int16_t>(v);
 //		}
 //		else if (f == 'H') {  /* uint16_t */
 //			buffer->sgetn(v, 2);
-//			value = boost::any_cast<uint16_t>(v) & 0xFFFF;
+//			value = bst::any_cast<uint16_t>(v) & 0xFFFF;
 //		}
 //		else if (f == 'n') { /* char[4] */
 //			buffer->sgetn(v, 4);
-//			value = boost::any_cast<string>(v);
+//			value = bst::any_cast<string>(v);
 //		}
 //		else if (f == 'N') { /* char[16] */
 //			buffer->sgetn(v, 16);
-//			value = boost::any_cast<string>(v);
+//			value = bst::any_cast<string>(v);
 //		}
 //		else if (f == 'Z') { /* char[64] */
 //			buffer->sgetn(v, 64);
-//			value = boost::any_cast<string>(v);
+//			value = bst::any_cast<string>(v);
 //		}
 //		else if (f == 'c') { /* int16_t * 100 */
 //			buffer->sgetn(v, 2);
-//			value = boost::any_cast<int16_t>(v) * 1e-2;
+//			value = bst::any_cast<int16_t>(v) * 1e-2;
 //		}
 //		else if (f == 'C') { /* uint16_t * 100 */
 //			buffer->sgetn(v, 2);
-//			value = (boost::any_cast<int16_t>(v) & 0xFFFF) * 1e-2;
+//			value = (bst::any_cast<int16_t>(v) & 0xFFFF) * 1e-2;
 //		}
 //		else if (f == 'e') { /* int32_t * 100 */
 //			buffer->sgetn(v, 4);
-//			value = boost::any_cast<int32_t>(v) * 1e-2;
+//			value = bst::any_cast<int32_t>(v) * 1e-2;
 //		}
 //		else if (f == 'E') { /* uint32_t * 100 */
 //			buffer->sgetn(v, 4);
-//			value = (boost::any_cast<int32_t>(v) & 0xFFFFFFFFl) * 1e-2;
+//			value = (bst::any_cast<int32_t>(v) & 0xFFFFFFFFl) * 1e-2;
 //		}
 //		else {
 //			cerr << "Invalid format char in message " << name << endl;
@@ -160,9 +160,9 @@ PX4LogMessageDescription::PX4LogMessageDescription(streambuf *buffer) {
 //}
 
 PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
-	vector<boost::any> _data;
+	vector<bst::any> _data;
 	uint8_t ofs = 0;
-	boost::any value;
+	bst::any value;
 	char _format[40];
 	size_t len = strlen(format.c_str()) + 1;
 	strcpy_s(_format, len, format.c_str());
@@ -170,7 +170,7 @@ PX4LogMessage* PX4LogMessageDescription::parseMessage(char* buffer) {
 		if (f == 'f') {
 			value = _GET_float(buffer, ofs);
 			ofs += 4;
-		//	cout << boost::any_cast<float>(value) << endl;
+		//	cout << bst::any_cast<float>(value) << endl;
 		}
 		else if (f == 'q') {
 			value = _GET_int64_t(buffer, ofs);

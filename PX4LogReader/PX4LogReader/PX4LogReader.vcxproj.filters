@@ -15,7 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PX4LogMessageDescription.h">
+    <ClCompile Include="PX4LogReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="boost_any.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="functions.h">
@@ -24,13 +29,8 @@
     <ClInclude Include="PX4LogMessage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="boost_any.h">
+    <ClInclude Include="PX4LogMessageDescription.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="PX4LogReader.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

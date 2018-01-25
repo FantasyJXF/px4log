@@ -32,32 +32,32 @@ public:
 		updateStatistics(buf);
 	}
 
-	/* ¶ÁÈ¡ÎÄ¼þ */
+	/* ï¿½ï¿½È¡ï¿½Ä¼ï¿½ */
 	streambuf* PX4LogReader::read_all(string filename);
 
-	/* ¶ÁÈ¡ÏûÏ¢Í· */
+	/* ï¿½ï¿½È¡ï¿½ï¿½Ï¢Í· */
 	uint8_t readHeader(streambuf *buf);
 
-	/* ¶ÁÈ¡ÏûÏ¢¸ñÊ½ */
+	/* ï¿½ï¿½È¡ï¿½ï¿½Ï¢ï¿½ï¿½Ê½ */
 	void readFormats(streambuf *buf);
 
-	/* ¸üÐÂÍ³¼ÆÊý¾Ý */
+	/* ï¿½ï¿½ï¿½ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 	void updateStatistics(streambuf *buf);
 
-	/* ¼ìË÷Ê±¼ä */
+	/* ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ */
 	bool seek(streambuf *buf, uint64_t seekTime);
 
-	/* ¶ÁÈ¡ÈÕÖ¾ÏûÏ¢ */
+	/* ï¿½ï¿½È¡ï¿½ï¿½Ö¾ï¿½ï¿½Ï¢ */
 	PX4LogMessage* readMessage(streambuf *buf);
 
-	/* Ó¦ÓÃÏûÏ¢ */
-	void applyMsg(unordered_map<string, boost::any> update, PX4LogMessage *msg);
+	/* Ó¦ï¿½ï¿½ï¿½ï¿½Ï¢ */
+	void applyMsg(unordered_map<string, bst::any> update, PX4LogMessage *msg);
 
-	/* ¶ÁÈ¡¸üÐÂ */
-	uint64_t readUpdate(unordered_map<string, boost::any> update, streambuf *buf);
+	/* ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ */
+	uint64_t readUpdate(unordered_map<string, bst::any> update, streambuf *buf);
 
-	/* ¶ÁÈ¡Ä¿±ê×Ö¶Î */
-	void getField(string field, streambuf *buf, vector<boost::any> vaules);
+	/* ï¿½ï¿½È¡Ä¿ï¿½ï¿½ï¿½Ö¶ï¿½ */
+	void getField(string field, streambuf *buf, vector<bst::any> vaules);
 };
 
 unordered_set<string> PX4LogReader::hideMsgs = unordered_set<string>({ "PARM", "FMT", "TIME", "VER" });
@@ -82,13 +82,13 @@ unordered_map<char, string> PX4LogReader::formatNames = unordered_map<char, stri
 																			{'M', "uint8 (mode)"}});
 
 streambuf* PX4LogReader::read_all(string filename) {
-	// Òª¶ÁÈëÕû¸öÎÄ¼þ£¬±ØÐë²ÉÓÃ¶þ½øÖÆ´ò¿ª   
+	// Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½ï¿½Æ´ï¿½   
 	ifstream ifile(filename, ios::in | ios::binary);
 
-	//  »ñÈ¡filestr¶ÔÓ¦buffer¶ÔÏóµÄÖ¸Õë   
+	//  ï¿½ï¿½È¡filestrï¿½ï¿½Ó¦bufferï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½   
 	streambuf *pbuf = ifile.rdbuf();
 
-	// ½«Ö¸ÕëÎ»ÖÃÒÆ¶¯µ½µÚÒ»¸ö×Ö½Ú
+	// ï¿½ï¿½Ö¸ï¿½ï¿½Î»ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö½ï¿½
 	//pbuf->pubseekoff(0, ifile.beg);
 	pbuf->pubseekpos(0);
 
@@ -99,6 +99,9 @@ streambuf* PX4LogReader::read_all(string filename) {
 
 uint8_t PX4LogReader::readHeader(streambuf *buf) {
 	uint8_t byte1 = buf->sbumpc() & 0xFF;
+	if (0xFF == byte1) {
+		cout << "Hits the End" << endl;
+	}
 	uint8_t byte2 = buf->sbumpc() & 0xFF;
 	if (0xFF == byte1 && 0xFF == byte2) {
 		//cout << "Here the file ends" << endl;
@@ -123,32 +126,32 @@ void PX4LogReader::readFormats(streambuf *buf) {
 		uint8_t msgType = readHeader(buf);
 		if (msgType == FORMAT.type) {
 			num += FORMAT.length;
-			// Ð´ÈëÁËÃ¿ÖÖÏûÏ¢µÄÃèÊö
+			// Ð´ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			PX4LogMessageDescription msgDescr(buf);
 			messageDescriptions.insert({msgDescr.type, msgDescr});
-			// Êä³ö¼ÇÂ¼µÄÈÕÖ¾ÏûÏ¢ÀàÐÍ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
 			//cout << msgDescr.name << endl;
 			if (!(hideMsgs.count(msgDescr.name) > 0)) {
-				// Ò»¹²ÓÐfields_num¸ö¹Ø×¢µÄÈÕÖ¾ÏûÏ¢
+				// Ò»ï¿½ï¿½ï¿½ï¿½fields_numï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½Ï¢
 				int fields_num = msgDescr.fields.size();
-				// Ã¿¸öfieldµÄÊý¾ÝÀàÐÍ
+				// Ã¿ï¿½ï¿½fieldï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				const char *format_type = msgDescr.format.c_str();
 				vector<string>::iterator iter = msgDescr.fields.begin();
 				for (int i = 0; i < fields_num; i++) {
 					string field = *iter;
 					string format;
-					// ½«formatÖÐµÄÃ¿Ò»¸ö×ÖÄ¸ËõÐ´×ª»»³É¾ßÌåµÄ¸ñÊ½×Ö·û´®  ÀýÈç b -> uint_8
+					// ï¿½ï¿½formatï¿½Ðµï¿½Ã¿Ò»ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½Ð´×ªï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Ä¸ï¿½Ê½ï¿½Ö·ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ b -> uint_8
 					unordered_map<char, string>::const_iterator got = formatNames.find(format_type[i]);
 					if (got == formatNames.end()) {
 						cout << format_type[i] << "not found" << endl;;
 					}
 					else {
-						// µÃµ½Êý¾ÝÀàÐÍ
+						// ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 						format = got->second;
 						//cout << format << endl;
 					}
 					iter++;
-					// ½«×Ö¶ÎÃûÓëÆä¶ÔÓ¦µÄÊý¾ÝÀàÐÍ¶ÔÓ¦ÆðÀ´£¬  ÀýÈç£º ATT.Pitch  ¶ÔÓ¦ float
+					// ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ç£º ATT.Pitch  ï¿½ï¿½Ó¦ float
 					if (i != 0 || strcmp("TimeMS", field.c_str()) || !strcmp("TimeUS", field.c_str())) {
 						fieldsList.insert({ msgDescr.name + "." + field, format });
 					}
@@ -156,9 +159,9 @@ void PX4LogReader::readFormats(streambuf *buf) {
 			}
 		}
 		else {
-			// ¶ÁÈ¡Êý¾ÝÏûÏ¢
-			// ËùÓÐµÄ¸ñÊ½¶¼ÒÑ¾­¶ÁºÃÁË
-			// ½«Ö¸Õë»Øµ½Êý¾Ý¿ªÊ¼´«ÊäµÄÎ»ÖÃ
+			// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+			// ï¿½ï¿½ï¿½ÐµÄ¸ï¿½Ê½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			// ï¿½ï¿½Ö¸ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½Ý¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 			dataStart = buf->pubseekpos(num); 
 			cout << "the position now is " << dataStart << endl;
 			return;
@@ -169,10 +172,10 @@ void PX4LogReader::readFormats(streambuf *buf) {
 PX4LogMessage* PX4LogReader::readMessage(streambuf *buf) {
 	while (true) {
 		PX4LogMessageDescription messageDescription;
-		int msgType = readHeader(buf); // ¶ÁÈ¡ÏûÏ¢Í·  »ñµÃÏûÏ¢ID
-		//long pos = buf->pubseekpos();// µ±Ç°Î»ÖÃ
+		int msgType = readHeader(buf); // ï¿½ï¿½È¡ï¿½ï¿½Ï¢Í·  ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ID
+		//long pos = buf->pubseekpos();// ï¿½ï¿½Ç°Î»ï¿½ï¿½
 
-		// Í¨¹ýÏûÏ¢ID»ñÈ¡ÏûÏ¢µÄÃèÊö£º×Ö¶Î¡¢Êý¾ÝÀàÐÍ¡¢¡¢¡¢
+		// Í¨ï¿½ï¿½ï¿½ï¿½Ï¢IDï¿½ï¿½È¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶Î¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¡ï¿½ï¿½ï¿½ï¿½ï¿½
 		unordered_map<uint8_t, PX4LogMessageDescription>::const_iterator got = messageDescriptions.find(msgType);
 		if (got == messageDescriptions.end()) {
 			cout << "msgType "<< msgType << " not found" << endl;
@@ -186,11 +189,11 @@ PX4LogMessage* PX4LogReader::readMessage(streambuf *buf) {
 			continue;
 		}
 		
-		// ½«Ò»ÖÖÏûÏ¢µÄÊý¾ÝËùÕ¼³¤¶È×Ö·û´®Ð´Èëbuffer
+		// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ð´ï¿½ï¿½buffer
 		uint8_t len = messageDescription.length - HEADER_LEN;
 		char *buffer = new char[len];
 		buf->sgetn(buffer, len);
-		PX4LogMessage *PX4LogMsg = messageDescription.parseMessage(buffer); // ·µ»ØÏûÏ¢ÓëÊý¾Ý
+		PX4LogMessage *PX4LogMsg = messageDescription.parseMessage(buffer); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		return PX4LogMsg;
 	}
 }
@@ -206,9 +209,9 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		PX4LogMessage *msg;
 		try {
 			PX4LogMessageDescription messageDescription;
-			int msgType = readHeader(buf); // ¶ÁÈ¡ÏûÏ¢Í·  »ñµÃÏûÏ¢ID
-			//long pos = buf->pubseekpos();// µ±Ç°Î»ÖÃ
-			// Í¨¹ýÏûÏ¢ID»ñÈ¡ÏûÏ¢µÄÃèÊö£º×Ö¶Î¡¢Êý¾ÝÀàÐÍ¡¢
+			int msgType = readHeader(buf); // ï¿½ï¿½È¡ï¿½ï¿½Ï¢Í·  ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ID
+			//long pos = buf->pubseekpos();// ï¿½ï¿½Ç°Î»ï¿½ï¿½
+			// Í¨ï¿½ï¿½ï¿½ï¿½Ï¢IDï¿½ï¿½È¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶Î¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¡ï¿½
 			unordered_map<uint8_t, PX4LogMessageDescription>::const_iterator got = messageDescriptions.find(msgType);
 			if (got == messageDescriptions.end()) {
 				cout << "msgType " << msgType << " not found" << endl;
@@ -222,12 +225,12 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 				continue;
 			}
 
-			// ½«Ò»ÖÖÏûÏ¢µÄÊý¾ÝËùÕ¼³¤¶È×Ö·û´®Ð´Èëbuffer
+			// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ð´ï¿½ï¿½buffer
 			uint8_t len = messageDescription.length - HEADER_LEN;
 			char *buffer = new char[len];
 			buf->sgetn(buffer, len);
 			//PX4LogMessage *
-				msg = messageDescription.parseMessage(buffer); // ·µ»ØÏûÏ¢ÓëÊý¾Ý
+				msg = messageDescription.parseMessage(buffer); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			//PX4LogMessage* msg = readMessage(buf);
 		}
 		catch (std::exception& e){
@@ -239,9 +242,9 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		//show_vector(msg->data);
 
 		// TIME
-		// Ê±¼ä·¶Î§
+		// Ê±ï¿½ä·¶Î§
 		if ("TIME" == Name) {
-			uint64_t t = boost::any_cast<uint64_t>(msg->data[0]);
+			uint64_t t = bst::any_cast<uint64_t>(msg->data[0]);
 			time = t;
 			if (timeStart < 0) {
 				timeStart = t;
@@ -252,7 +255,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		packetsNum++;
 
 		// Version
-		// °æ±¾
+		// ï¿½æ±¾
 		if ("VER" == Name) {
 			string fw, hw;
 			unordered_map<string, int>::const_iterator got1 = msg->description->fieldsMap.find("FwGit");
@@ -261,7 +264,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx1 = got1->second;
-				fw = boost::any_cast<string>(msg->data[idx1]);
+				fw = bst::any_cast<string>(msg->data[idx1]);
 				version.insert({ "FW", fw });
 			}
 
@@ -271,7 +274,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx2 = got2->second;
-				hw = boost::any_cast<string>(msg->data[idx2]);
+				hw = bst::any_cast<string>(msg->data[idx2]);
 				version.insert({ "HW", hw });
 			}
 			//cout<< "Data of VER" << endl;
@@ -279,11 +282,11 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		}
 
 		// Parameters
-		// ²ÎÊý		
+		// ï¿½ï¿½ï¿½ï¿½		
 		if ("PARM" == Name) {
-			string _name; // Ð´ÈëÊ±ÊÇchar[16]
+			string _name; // Ð´ï¿½ï¿½Ê±ï¿½ï¿½char[16]
 			float _value;
-			boost::any anyone;
+			bst::any anyone;
 			
 			unordered_map<string, int>::const_iterator got3 = msg->description->fieldsMap.find("Name");
 			if (got3 == msg->description->fieldsMap.end()) {
@@ -291,7 +294,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx3 = got3->second;
-				_name = boost::any_cast<string>(msg->data[idx3]);
+				_name = bst::any_cast<string>(msg->data[idx3]);
 			}
 
 			unordered_map<string, int>::const_iterator got4 = msg->description->fieldsMap.find("Value");
@@ -300,7 +303,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 			}
 			else {
 				int idx4 = got4->second;
-				_value = boost::any_cast<float>(msg->data[idx4]);
+				_value = bst::any_cast<float>(msg->data[idx4]);
 			}
 			parameters.insert({ _name,_value });
 			//cout << "Data of Parameters" << endl;
@@ -308,7 +311,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 		}
 
 		// GPS
-		// GPSÊ±¼äÐÅÏ¢
+		// GPSÊ±ï¿½ï¿½ï¿½ï¿½Ï¢
 		if ("GPS" == Name) {
 			if (utcTimeReference < 0) {
 				int fix = 0;
@@ -319,7 +322,7 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 				}
 				else {
 					int idx5 = got5->second;
-					fix = boost::any_cast<int>(msg->data[idx5]);
+					fix = bst::any_cast<int>(msg->data[idx5]);
 				}
 
 				unordered_map<string, int>::const_iterator got6 = msg->description->fieldsMap.find("GPSTime");
@@ -328,31 +331,31 @@ void PX4LogReader::updateStatistics(streambuf *buf) {
 				}
 				else {
 					int idx6 = got6->second;
-					gpsT = boost::any_cast<uint64_t>(msg->data[idx6]);
+					gpsT = bst::any_cast<uint64_t>(msg->data[idx6]);
 				}
 
 				if (fix >= 3 && gpsT > 0) {
-					utcTimeReference = gpsT - timeEnd; // µ±GPS×´Ì¬Á¼ºÃÊ±»ñµÃUTCµÄÊ±¼ä²Î¿¼
+					utcTimeReference = gpsT - timeEnd; // ï¿½ï¿½GPS×´Ì¬ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½UTCï¿½ï¿½Ê±ï¿½ï¿½Î¿ï¿½
 				}
 			}
 		}
 	}
-	startMicroseconds = timeStart; // ½âËøÊ±µÄÊ±¼ä
+	startMicroseconds = timeStart; // ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½
 	sizeUpdates = packetsNum;
 	sizeMicroseconds = timeEnd - timeStart;
-	seek(buf,0);  // ¿ªÊ¼¼ÇÈÕÖ¾
+	seek(buf,0);  // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¾
 }
 
 bool PX4LogReader::seek(streambuf *buf,uint64_t seekTime) {
 	buf->pubseekpos(dataStart);
 	lastMsg = NULL;
-	if (seekTime == 0) {      // Seek to start of log ¿ªÊ¼¼ÇÈÕÖ¾
+	if (seekTime == 0) {      // Seek to start of log ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¾
 		time = 0;
 		return true;
 	}
 
 	while (true) {
-		// »ñµÃÊý¾ÝÁ÷µÄµ±Ç°Ö¸ÕëÎ»ÖÃ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ç°Ö¸ï¿½ï¿½Î»ï¿½ï¿½
 		//uint64_t pos = position();
 		uint8_t msgType = readHeader(buf);
 		PX4LogMessageDescription messageDescription;
@@ -375,25 +378,25 @@ bool PX4LogReader::seek(streambuf *buf,uint64_t seekTime) {
 		if ("TIME" == messageDescription.name) {
 			PX4LogMessage *msg = messageDescription.parseMessage(buffer);
 			uint64_t t = 0;
-			t = boost::any_cast<uint64_t>(msg->data);
+			t = bst::any_cast<uint64_t>(msg->data[0]);
 			if (t > seekTime) {
 				// Time found
 				time = t;
-				//È·¶¨µ±Ç°Á÷µÄÎ»ÖÃ
+				//È·ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 				// position(pos);
 				return true;
 			}
 		}
 		else {
 			// Skip the message
-			// Ìø¹ý´ËÏûÏ¢
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 			//buffer.position(buffer.position() + bodyLen);
 			cout << "skip the message" << endl;
 		}
 	}
 }
 
-void PX4LogReader::applyMsg(unordered_map<string, boost::any> update, PX4LogMessage *msg) {
+void PX4LogReader::applyMsg(unordered_map<string, bst::any> update, PX4LogMessage *msg) {
 	vector<string> fields = msg->description->fields;
 	for (size_t i = 0; i < fields.size(); i++) {
 		string field = fields[i];
@@ -401,7 +404,7 @@ void PX4LogReader::applyMsg(unordered_map<string, boost::any> update, PX4LogMess
 	}
 }
 
-uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, streambuf *buf) {
+uint64_t PX4LogReader::readUpdate(unordered_map<string, bst::any> update, streambuf *buf) {
 	uint64_t t = time;
 	if (lastMsg != NULL) {
 		applyMsg(update, lastMsg);
@@ -410,9 +413,9 @@ uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, stre
 
 	while (true) {
 		PX4LogMessageDescription messageDescription;
-		int msgType = readHeader(buf); // ¶ÁÈ¡ÏûÏ¢Í·  »ñµÃÏûÏ¢ID
-									   //long pos = buf->pubseekpos();// µ±Ç°Î»ÖÃ
-									   // Í¨¹ýÏûÏ¢ID»ñÈ¡ÏûÏ¢µÄÃèÊö£º×Ö¶Î¡¢Êý¾ÝÀàÐÍ¡¢
+		int msgType = readHeader(buf); // ï¿½ï¿½È¡ï¿½ï¿½Ï¢Í·  ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ID
+									   //long pos = buf->pubseekpos();// ï¿½ï¿½Ç°Î»ï¿½ï¿½
+									   // Í¨ï¿½ï¿½ï¿½ï¿½Ï¢IDï¿½ï¿½È¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶Î¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¡ï¿½
 		unordered_map<uint8_t, PX4LogMessageDescription>::const_iterator got = messageDescriptions.find(msgType);
 		if (got == messageDescriptions.end()) {
 			cout << "msgType " << msgType << " not found" << endl;
@@ -426,18 +429,18 @@ uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, stre
 			continue;
 		}
 
-		// ½«Ò»ÖÖÏûÏ¢µÄÊý¾ÝËùÕ¼³¤¶È×Ö·û´®Ð´Èëbuffer
+		// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ð´ï¿½ï¿½buffer
 		uint8_t len = messageDescription.length - HEADER_LEN;
 		char *buffer = new char[len];
 		buf->sgetn(buffer, len);
-		PX4LogMessage *msg = messageDescription.parseMessage(buffer); // ·µ»ØÏûÏ¢ÓëÊý¾Ý
+		PX4LogMessage *msg = messageDescription.parseMessage(buffer); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		//PX4LogMessage msg = readMessage();
 		if (msg == NULL) {
 			continue;
 		}
 
 		if ("TIME" == msg->description->name) {
-			time = boost::any_cast<uint64_t>(msg->data[0]);
+			time = bst::any_cast<uint64_t>(msg->data[0]);
 			if (t == 0) {
 				// The first TIME message
 				t = time;
@@ -450,7 +453,7 @@ uint64_t PX4LogReader::readUpdate(unordered_map<string, boost::any> update, stre
 	return t;
 }
 
-void PX4LogReader::getField(string field, streambuf *buf, vector<boost::any> vaules) {
+void PX4LogReader::getField(string field, streambuf *buf, vector<bst::any> vaules) {
 	uint64_t pos = dataStart;
 	vector<string> _name;
 	split(field, _name, ".");
@@ -459,11 +462,11 @@ void PX4LogReader::getField(string field, streambuf *buf, vector<boost::any> vau
 	}
 
 	while (true) {
-		unordered_map<string, vector<boost::any>> update;
+		unordered_map<string, vector<bst::any>> update;
 		PX4LogMessageDescription messageDescription;
-		int msgType = readHeader(buf); // ¶ÁÈ¡ÏûÏ¢Í·  »ñµÃÏûÏ¢ID
-									   //long pos = buf->pubseekpos();// µ±Ç°Î»ÖÃ
-		// Í¨¹ýÏûÏ¢ID»ñÈ¡ÏûÏ¢µÄÃèÊö£º×Ö¶Î¡¢Êý¾ÝÀàÐÍ¡¢
+		int msgType = readHeader(buf); // ï¿½ï¿½È¡ï¿½ï¿½Ï¢Í·  ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ID
+									   //long pos = buf->pubseekpos();// ï¿½ï¿½Ç°Î»ï¿½ï¿½
+		// Í¨ï¿½ï¿½ï¿½ï¿½Ï¢IDï¿½ï¿½È¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶Î¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¡ï¿½
 		unordered_map<uint8_t, PX4LogMessageDescription>::const_iterator got = messageDescriptions.find(msgType);
 
 		if (got == messageDescriptions.end()) {
@@ -479,11 +482,11 @@ void PX4LogReader::getField(string field, streambuf *buf, vector<boost::any> vau
 			continue;
 		}
 		else {
-			// ½«Ò»ÖÖÏûÏ¢µÄÊý¾ÝËùÕ¼³¤¶È×Ö·û´®Ð´Èëbuffer
+			// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ð´ï¿½ï¿½buffer
 			uint8_t len = messageDescription.length - HEADER_LEN;
 			char *buffer = new char[len];
 			buf->sgetn(buffer, len);
-			PX4LogMessage *msg = messageDescription.parseMessage(buffer); // ·µ»ØÏûÏ¢ÓëÊý¾Ý
+			PX4LogMessage *msg = messageDescription.parseMessage(buffer); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 			vector<string> _fields = msg->description->fields;
 			for (size_t i = 0; i < _fields.size(); i++) {

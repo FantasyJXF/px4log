@@ -7,23 +7,23 @@ class PX4LogMessageDescription;
 class PX4LogMessage {
 public:
 	PX4LogMessageDescription *description;
-	vector<boost::any> data;
+	vector_any data;
 
 	PX4LogMessage() {
 		data = {0};
 	}
 
-	PX4LogMessage(PX4LogMessageDescription *_description, vector<boost::any> _data) {
+	PX4LogMessage(PX4LogMessageDescription *_description, vector<bst::any> _data) {
 		description = _description;
 		data = _data;
 	}
 
-//	boost::any gets(string field);
+//	bst::any gets(string field);
 };
 
-//boost::any PX4LogMessage::gets(string field) {
+//bst::any PX4LogMessage::gets(string field) {
 	//PX4LogMessage *log = new PX4LogMessage();
-	//boost::any anyone;
+	//bst::any anyone;
 
 	//anyone = description->name;
 
@@ -36,9 +36,9 @@ public:
 	//else {
 	//	idx = gots->second;
 	//}
-	//boost::any anyone;
+	//bst::any anyone;
 	//anyone = data[idx];
 
-//	boost::any anyone = 1;
+//	bst::any anyone = 1;
 //	return anyone;
 //}
